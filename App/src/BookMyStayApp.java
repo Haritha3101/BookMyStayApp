@@ -1,118 +1,102 @@
 import java.util.HashMap;
-import java.util.Map;
 
-/**
- * =========================================================================
- * DOMAIN MODELS (from Use Case 2 & 3)
- * =========================================================================
- */
 abstract class Room {
-    protected int numberOfBeds;
-    protected int squareFeet;
-    protected double pricePerNight;
 
-    public Room(int numberOfBeds, int squareFeet, double pricePerNight) {
-        this.numberOfBeds = numberOfBeds;
-        this.squareFeet = squareFeet;
-        this.pricePerNight = pricePerNight;
+    protected String type;
+    protected int beds;
+    protected int size;
+    protected double price;
+
+    public Room(String type, int beds, int size, double price) {
+        this.type = type;
+        this.beds = beds;
+        this.size = size;
+        this.price = price;
     }
 
-    public void displayRoomDetails() {
-        System.out.println("Beds: " + numberOfBeds);
-        System.out.println("Size: " + squareFeet + " sqft");
-        System.out.println("Price per night: " + pricePerNight);
+    public String getType() {
+        return type;
+    }
+
+    public void displayDetails() {
+        System.out.println("Room Type: " + type);
+        System.out.println("Beds: " + beds);
+        System.out.println("Size: " + size + " sq.ft");
+        System.out.println("Price per night: $" + price);
     }
 }
 
-class SingleRoom extends Room { public SingleRoom() { super(1, 250, 1500.0); } }
-class DoubleRoom extends Room { public DoubleRoom() { super(2, 400, 2500.0); } }
-class SuiteRoom extends Room  { public SuiteRoom()  { super(3, 750, 5000.0); } }
+class SingleRoom extends Room {
+    public SingleRoom() {
+        super("Single Room", 1, 250, 1500);
+    }
+}
 
-/**
- * CLASS - RoomInventory
- * Acts as the single source of truth for room availability.
- */
+class DoubleRoom extends Room {
+    public DoubleRoom() {
+        super("Double Room", 2, 400, 2500);
+    }
+}
+
+class SuiteRoom extends Room {
+    public SuiteRoom() {
+        super("Suite Room", 3, 750, 5000);
+    }
+}
+
 class RoomInventory {
-    private Map<String, Integer> roomAvailability;
+
+    private HashMap<String, Integer> inventory;
 
     public RoomInventory() {
-        roomAvailability = new HashMap<>();
-        roomAvailability.put("Single", 5);
-        roomAvailability.put("Double", 3);
-        roomAvailability.put("Suite", 2);
+        inventory = new HashMap<>();
+        inventory.put("Single Room", 5);
+        inventory.put("Double Room", 3);
+        inventory.put("Suite Room", 2);
     }
 
-    public Map<String, Integer> getRoomAvailability() {
-        return roomAvailability;
+    public int getAvailability(String roomType) {
+        return inventory.getOrDefault(roomType, 0);
     }
 }
 
-/**
- * =========================================================================
- * CLASS - RoomSearchService
- * =========================================================================
- * Use Case 4: Room Search & Availability Check
- * This class provides read-only search functionality for guests.
- * @version 4.0
- */
-class RoomSearchService {
+class SearchService {
 
-    /**
-     * Displays available rooms along with their details and pricing.
-     * This method performs read-only access to inventory and room data.
-     * * @param inventory  centralized room inventory
-     * @param singleRoom single room definition
-     * @param doubleRoom double room definition
-     * @param suiteRoom  suite room definition
-     */
-    public void searchAvailableRooms(
-            RoomInventory inventory,
-            Room singleRoom,
-            Room doubleRoom,
-            Room suiteRoom) {
+    private RoomInventory inventory;
 
-        Map<String, Integer> availability = inventory.getRoomAvailability();
+    public SearchService(RoomInventory inventory) {
+        this.inventory = inventory;
+    }
 
-        System.out.println("Room Search Results:");
-        System.out.println("====================");
+    public void searchAvailableRooms(Room[] rooms) {
 
-        if (availability.getOrDefault("Single", 0) > 0) {
-            System.out.println("\nSingle Room:");
-            singleRoom.displayRoomDetails();
-            System.out.println("Available: " + availability.get("Single"));
-        }
+        System.out.println("=== Available Rooms ===");
 
-        if (availability.getOrDefault("Double", 0) > 0) {
-            System.out.println("\nDouble Room:");
-            doubleRoom.displayRoomDetails();
-            System.out.println("Available: " + availability.get("Double"));
-        }
+        for (Room room : rooms) {
 
-        if (availability.getOrDefault("Suite", 0) > 0) {
-            System.out.println("\nSuite Room:");
-            suiteRoom.displayRoomDetails();
-            System.out.println("Available: " + availability.get("Suite"));
+            int available = inventory.getAvailability(room.getType());
+
+            if (available > 0) {
+                room.displayDetails();
+                System.out.println("Available Rooms: " + available);
+                System.out.println();
+            }
         }
     }
 }
 
-/**
- * =========================================================================
- * MAIN CLASS - UseCase4RoomSearch
- * =========================================================================
- * Enforces read-only access by design and usage discipline.
- * @version 4.0
- */
 public class BookMyStayApp {
-
-    public static void main(String[] args) {
+    public static void main (String[] args){
         RoomInventory inventory = new RoomInventory();
 
-        Room single = new SingleRoom();
-        Room doubleR = new DoubleRoom();
-        Room suite = new SuiteRoom();
+        Room[] rooms = {
+                new SingleRoom(),
+                new DoubleRoom(),
+                new SuiteRoom()
+        };
 
-        RoomSearchService searchService = new RoomSearchService();
-        searchService.searchAvailableRooms(inventory, single, doubleR, suite);
+        SearchService searchService = new SearchService(inventory);
+
+        searchService.searchAvailableRooms(rooms);
     }
 }
