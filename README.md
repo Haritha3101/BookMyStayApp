@@ -10,3 +10,4 @@
 # UC9 validates hotel bookings using custom exceptions to ensure valid guest details, room type, and room availability.
 # UC10 handles booking cancellations with safe inventory rollback using a stack-based approach.
 # UC11 simulates concurrent hotel booking using multithreading and synchronization to ensure thread-safe room allocation and consistent inventory management.
+# UC12demonstrates data persistence and system recovery by saving and loading inventory state using file serialization. 
