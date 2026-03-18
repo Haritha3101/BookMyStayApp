@@ -6,3 +6,4 @@
 # UC5  manages and orders incoming booking requests
 # UC6  processes queued booking requests and performs room allocation and maintains and updates room availability state.
 # UC7 allows users to add optional services to reservations and calculate their total cost without affecting core booking logic.
+# UC8 stores confirmed reservations and generates simple booking history reports.
